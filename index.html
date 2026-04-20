@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System VIP - Discord</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: white; display: flex; justify-content: center; padding: 20px; }
+        .container { max-width: 450px; width: 100%; }
+        .card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; margin-bottom: 20px; text-align: center; border: 1px solid #333; }
+        button { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; margin-top: 10px; }
+        .btn-admin { background: #007bff; color: white; }
+        .btn-test { background: #28a745; color: white; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 2px solid #444; background: #2a2a2a; color: white; text-align: center; box-sizing: border-box; }
+        .code-output { margin-top: 15px; color: #ffcc00; font-family: monospace; font-size: 1.3em; letter-spacing: 2px; background: #000; padding: 10px; border-radius: 5px; }
+        hr { border: 0; height: 1px; background: #333; margin: 30px 0; }
+        .shake { animation: shake 0.5s; border-color: #e74c3c !important; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+  <div id="login-section" class="card">
+    <h2>Admin Login</h2>
+    <input type="password" id="adminPass" placeholder="Hasło panelu">
+    <button class="btn-admin" onclick="checkLogin()">Zaloguj</button>
+  </div>
+
+  <div id="admin-section" class="card" style="display: none;">
+    <h2>Panel Admina</h2>
+    <select id="codeRank">
+      <option value="Standard">Standard</option>
+      <option value="VIP">VIP</option>
+      <option value="Elite">Elite</option>
+    </select>
+    <button class="btn-admin" onclick="generateCode()">Generuj Kod</button>
+    <div id="codeDisplay" class="code-output"></div>
+    <div id="stats" style="margin:15px 0; color:#888;">Aktywne kody: <span id="codeCounter">0</span></div>
+    <div id="historyList" style="font-size:0.8em; color:#555; margin-bottom:15px;"></div>
+    <input type="password" id="newPassInput" placeholder="Nowe hasło">
+    <button onclick="changeAdminPassword()" style="background:#444; font-size:11px;">Zmień hasło panelu</button>
+    <button onclick="logout()" style="background:#c0392b; font-size:11px;">Wyloguj</button>
+  </div>
+
+  <hr>
+
+  <div id="test-section" class="card">
+    <h2>Aktywacja Nagrody</h2>
+    <input type="text" id="discordNick" placeholder="Twój Nick#1234">
+    <input type="text" id="userCode" placeholder="Kod 16-cyfrowy" maxlength="16">
+    <button class="btn-test" onclick="redeemCode()">Aktywuj VIP</button>
+  </div>
+
+  <div id="premium-content" class="card" style="display: none;">
+    <h2>✨ SUKCES! ✨</h2>
+    <div style="padding: 20px; background: #2f3136; border-radius: 12px; border: 2px solid #5865f2;">
+       <p id="rankInfo" style="font-weight:bold; color: #5865f2;"></p>
+       <a href="https://discord.gg/R4B7Uzrjbq" target="_blank" style="text-decoration:none;">
+         <button style="background:#5865f2; color:white;">DOŁĄCZ DO DISCORDA</button>
+       </a>
+    </div>
+    <button onclick="location.reload()" style="background:none; color:#555; font-size:0.8em;">Odśwież</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<script>
+let ADMIN_PASSWORD = localStorage.getItem('adminPassword') || "admin123";
+const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1495873957574873133/-r54lqxF_YnWd_VVKbkoPW-RLZfcpKysJl6JusjBQTjQgBEsk1AZUlEVZNTJ3_hSD0Sl";
+
+function checkLogin() {
+    if (document.getElementById('adminPass').value === ADMIN_PASSWORD) {
+        document.getElementById('login-section').style.display = "none";
+        document.getElementById('admin-section').style.display = "block";
+        updateUI();
+    } else { alert("Błędne hasło!"); }
+}
+
+function generateCode() {
+    let newCode = "";
+    for(let i=0; i<16; i++) newCode += Math.floor(Math.random()*10);
+    let rank = document.getElementById('codeRank').value;
+    let codes = JSON.parse(localStorage.getItem('activeCodesRanked')) || [];
+    codes.push({ key: newCode, type: rank });
+    localStorage.setItem('activeCodesRanked', JSON.stringify(codes));
+    document.getElementById('codeDisplay').innerText = newCode;
+    updateUI();
+}
+
+function updateUI() {
+    let codes = JSON.parse(localStorage.getItem('activeCodesRanked')) || [];
+    document.getElementById('codeCounter').innerText = codes.length;
+    let history = "";
+    codes.slice(-3).reverse().forEach(c => history += c.key + " [" + c.type + "]<br>");
+    document.getElementById('historyList').innerHTML = history;
+}
+
+function redeemCode() {
+    let nick = document.getElementById('discordNick').value;
+    let input = document.getElementById('userCode').value;
+    let codes = JSON.parse(localStorage.getItem('activeCodesRanked')) || [];
+    let idx = codes.findIndex(c => c.key === input);
+
+    if (nick && idx !== -1) {
+        let activated = codes[idx];
+        fetch(DISCORD_WEBHOOK, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: `🚀 **AKTYWACJA!**\n**Użytkownik:** ${nick}\n**Ranga:** ${activated.type}` })
+        });
+        codes.splice(idx, 1);
+        localStorage.setItem('activeCodesRanked', JSON.stringify(codes));
+        confetti({ particleCount: 150, spread: 70 });
+        document.getElementById('test-section').style.display = "none";
+        document.getElementById('premium-content').style.display = "block";
+        document.getElementById('rankInfo').innerText = "Ranga: " + activated.type;
+    } else { alert("Błędny kod lub brak nicku!"); }
+}
+
+function logout() { location.reload(); }
+function changeAdminPassword() {
+    let p = document.getElementById('newPassInput').value;
+    if(p.length > 3) { ADMIN_PASSWORD = p; localStorage.setItem('adminPassword', p); alert("Zmieniono!"); logout(); }
+}
+</script>
+</body>
+</html>
