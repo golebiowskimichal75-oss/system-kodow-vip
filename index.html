@@ -13,6 +13,7 @@
     <h2>Admin Login</h2>
     <input type="password" id="adminPass" placeholder="Hasło panelu">
     <button class="btn-admin" onclick="checkLogin()">Zaloguj</button>
+    <div id="loginError" style="margin-top: 10px; font-size: 0.9em; min-height: 20px;"></div>
   </div>
 
   <div id="admin-section" class="card" style="display: none;">
@@ -24,10 +25,12 @@
     </select>
     <button class="btn-admin" onclick="generateCode()">Generuj Kod</button>
     <div id="codeDisplay" class="code-output"></div>
+    
     <div id="stats" style="margin:15px 0; color:#888;">Aktywne kody: <span id="codeCounter">0</span></div>
     <div id="historyList" style="font-size:0.8em; color:#555; margin-bottom:15px;"></div>
+    
     <input type="password" id="newPassInput" placeholder="Nowe hasło">
-    <button onclick="changeAdminPassword()" style="background:#444; font-size:11px;">Zmień hasło panelu</button>
+    <button onclick="changeAdminPassword()" style="background:#444; font-size:11px; margin-bottom: 5px;">Zmień hasło panelu</button>
     <button onclick="logout()" style="background:#c0392b; font-size:11px;">Wyloguj</button>
   </div>
 
@@ -38,6 +41,7 @@
     <input type="text" id="discordNick" placeholder="Twój Nick#1234">
     <input type="text" id="userCode" placeholder="Kod 16-cyfrowy" maxlength="16">
     <button class="btn-test" onclick="redeemCode()">Aktywuj VIP</button>
+    <div id="statusMsg" style="margin-top: 10px; font-size: 0.9em; min-height: 20px;"></div>
   </div>
 
   <div id="premium-content" class="card" style="display: none;">
@@ -48,7 +52,7 @@
          <button style="background:#5865f2; color:white;">DOŁĄCZ DO DISCORDA</button>
        </a>
     </div>
-    <button onclick="location.reload()" style="background:none; color:#555; font-size:0.8em;">Odśwież</button>
+    <button onclick="location.reload()" style="background:none; color:#555; font-size:0.8em; margin-top: 15px;">Wróć do startu</button>
   </div>
 </div>
 
