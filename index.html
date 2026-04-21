@@ -3,59 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System VIP - Discord</title>
+    <title>System VIP - Menu</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
-  <div id="login-section" class="card">
-    <h2>Admin Login</h2>
-    <input type="password" id="adminPass" placeholder="Hasło panelu">
-    <button class="btn-admin" onclick="checkLogin()">Zaloguj</button>
-    <div id="loginError" style="margin-top: 10px; font-size: 0.9em; min-height: 20px;"></div>
+  <nav class="nav-menu">
+    <button onclick="showPage('home')">Główna</button>
+    <button onclick="showPage('info')">Informacje</button>
+    <button onclick="window.open('https://discord.gg/R4B7Uzrjbq', '_blank')">Discord</button>
+    <button onclick="window.open('https://youtube.com', '_blank')">YouTube</button>
+  </nav>
+
+  <div id="page-home" class="tab-content active">
+    <div id="login-section" class="card">
+      <h2>Admin Login</h2>
+      <input type="password" id="adminPass" placeholder="Hasło panelu">
+      <button class="btn-admin" onclick="checkLogin()">Zaloguj</button>
+      <div id="loginError" style="margin-top: 10px; font-size: 0.9em; min-height: 20px;"></div>
+    </div>
+
+    <div id="admin-section" class="card" style="display: none;">
+      <h2>Panel Admina</h2>
+      <select id="codeRank">
+        <option value="Standard">Standard</option>
+        <option value="VIP">VIP</option>
+        <option value="Elite">Elite</option>
+      </select>
+      <button class="btn-admin" onclick="generateCode()">Generuj Kod</button>
+      <div id="codeDisplay" class="code-output">...</div>
+      <div id="stats" style="margin:15px 0; color:#888;">Aktywne kody: <span id="codeCounter">0</span></div>
+      <div id="historyList" style="font-size:0.8em; color:#555; margin-bottom:10px;"></div>
+      <button class="btn-delete" onclick="clearHistory()">Wyczyść historię kodów</button>
+      <hr style="border:0; border-top:1px solid #333; margin: 15px 0;">
+      <button onclick="logout()" style="background:#c0392b; font-size:11px;">Wyloguj</button>
+    </div>
+
+    <hr style="border:0; height:1px; background:#333; margin:30px 0;">
+
+    <div id="test-section" class="card">
+      <h2>Aktywacja Nagrody</h2>
+      <input type="text" id="discordNick" placeholder="Twój Nick#1234">
+      <input type="text" id="userCode" placeholder="Kod 16-cyfrowy" maxlength="16">
+      <button class="btn-test" onclick="redeemCode()">Aktywuj VIP</button>
+      <div id="statusMsg" style="margin-top: 10px; font-size: 0.9em; min-height: 20px;"></div>
+    </div>
   </div>
 
-  <div id="admin-section" class="card" style="display: none;">
-    <h2>Panel Admina</h2>
-    <select id="codeRank">
-      <option value="Standard">Standard</option>
-      <option value="VIP">VIP</option>
-      <option value="Elite">Elite</option>
-    </select>
-    <button class="btn-admin" onclick="generateCode()">Generuj Kod</button>
-    <div id="codeDisplay" class="code-output">...</div>
-    
-    <div id="stats" style="margin:15px 0; color:#888;">Aktywne kody: <span id="codeCounter">0</span></div>
-    <div id="historyList" style="font-size:0.8em; color:#555; margin-bottom:10px;"></div>
-    
-    <button class="btn-delete" onclick="clearHistory()">Wyczyść historię kodów</button>
-    
-    <hr style="border:0; border-top:1px solid #333; margin: 15px 0;">
-    <input type="password" id="newPassInput" placeholder="Nowe hasło">
-    <button onclick="changeAdminPassword()" style="background:#333; font-size:11px;">Zmień hasło</button>
-    <button onclick="logout()" style="background:#c0392b; font-size:11px;">Wyloguj</button>
-  </div>
-
-  <hr style="border:0; height:1px; background:#333; margin:30px 0;">
-
-  <div id="test-section" class="card">
-    <h2>Aktywacja Nagrody</h2>
-    <input type="text" id="discordNick" placeholder="Twój Nick#1234">
-    <input type="text" id="userCode" placeholder="Kod 16-cyfrowy" maxlength="16">
-    <button class="btn-test" onclick="redeemCode()">Aktywuj VIP</button>
-    <div id="statusMsg" style="margin-top: 10px; font-size: 0.9em; min-height: 20px;"></div>
+  <div id="page-info" class="tab-content">
+    <div class="card">
+      <h2>Informacje</h2>
+      <p style="color: #ccc; line-height: 1.6;">Witaj w naszym systemie! Tutaj możesz aktywować rangi zakupione na naszym serwerze. Każdy kod jest jednorazowy.</p>
+      <ul style="text-align: left; color: #888; font-size: 0.9em;">
+        <li>Ranga Standard: Podstawowe bonusy</li>
+        <li>Ranga VIP: Złoty nick i dostęp do kanałów</li>
+        <li>Ranga Elite: Wszystkie przywileje</li>
+      </ul>
+      <button class="btn-admin" onclick="showPage('home')">Powrót do strony głównej</button>
+    </div>
   </div>
 
   <div id="premium-content" class="card" style="display: none;">
     <h2>✨ SUKCES! ✨</h2>
     <div style="padding: 20px; background: #2f3136; border-radius: 12px; border: 2px solid #5865f2;">
        <p id="rankInfo" style="font-weight:bold; color: #5865f2;"></p>
-       <a href="https://discord.gg/R4B7Uzrjbq" target="_blank" style="text-decoration:none;">
-         <button style="background:#5865f2; color:white;">DOŁĄCZ DO DISCORDA</button>
-       </a>
     </div>
-    <button onclick="location.reload()" style="background:none; color:#555; font-size:0.8em; margin-top:15px; cursor:pointer;">Wróć</button>
+    <button onclick="location.reload()" style="background:none; color:#555; font-size:0.8em; margin-top:15px;">Wróć</button>
   </div>
 </div>
 
