@@ -1,5 +1,6 @@
 let ADMIN_PASSWORD = localStorage.getItem('adminPassword') || "admin123";
-const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1495873957574873133/-r54lqxF_YnWd_VVKbkoPW-RLZfcpKysJl6JusjBQTjQgBEsk1AZUlEVZNTJ3_hSD0Sl";
+// TWÓJ NOWY WEBHOOK
+const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1495875218294575195/WR7mxjeDF-kmVIye6puISi5nNybKNg9LX_bBcMPp_uJ1Z3OTh33HP7cx_DPlNIjUduF3";
 
 function showMsg(elementId, text, isError = true) {
     const el = document.getElementById(elementId);
@@ -14,7 +15,6 @@ function showMsg(elementId, text, isError = true) {
     setTimeout(() => { el.innerText = ""; }, 3000);
 }
 
-// 1. GENEROWANIE I AUTOMATYCZNE KOPIOWANIE
 function generateCode() {
     let newCode = "";
     for(let i=0; i<16; i++) newCode += Math.floor(Math.random()*10);
@@ -25,20 +25,22 @@ function generateCode() {
     
     document.getElementById('codeDisplay').innerText = newCode;
     
-    // Kopiowanie do schowka
+    // Automatyczne kopiowanie do schowka
     navigator.clipboard.writeText(newCode).then(() => {
         showMsg("loginError", "✅ Skopiowano do schowka!", false);
+    }).catch(() => {
+        showMsg("loginError", "⚠️ Wygenerowano (brak uprawnień)");
     });
     
     updateUI();
 }
 
-// 3. CZYSZCZENIE HISTORII
 function clearHistory() {
-    if(confirm("Czy na pewno usunąć wszystkie aktywne kody?")) {
+    if(confirm("Czy na pewno chcesz usunąć WSZYSTKIE aktywne kody?")) {
         localStorage.removeItem('activeCodesRanked');
         updateUI();
         document.getElementById('codeDisplay').innerText = "WYCZYSZCZONO";
+        showMsg("loginError", "✅ Usunięto bazę kodów", false);
     }
 }
 
@@ -66,8 +68,6 @@ function redeemCode() {
 
     if (idx !== -1) {
         let activated = codes[idx];
-        
-        // 4. LICZNIK CZASU (Godzina aktywacji)
         const now = new Date();
         const timeStr = now.getHours() + ":" + String(now.getMinutes()).padStart(2, '0');
 
@@ -103,9 +103,20 @@ function checkLogin() {
     }
 }
 
+function changeAdminPassword() {
+    let p = document.getElementById('newPassInput').value;
+    if(p.length > 3) { 
+        ADMIN_PASSWORD = p; 
+        localStorage.setItem('adminPassword', p); 
+        alert("Hasło zmienione!");
+        logout(); 
+    }
+}
+
 function logout() { 
     document.getElementById('admin-section').style.display = "none";
     document.getElementById('login-section').style.display = "block";
+    document.getElementById('adminPass').value = "";
 }
 
 updateUI();
