@@ -13,7 +13,6 @@
     <h2>Admin Login</h2>
     <input type="password" id="adminPass" placeholder="Hasło panelu">
     <button class="btn-admin" onclick="checkLogin()">Zaloguj</button>
-    <button class="btn-delete" onclick="clearHistory()">Wyczyść historię kodów</button>
     <div id="loginError" style="margin-top: 10px; font-size: 0.9em; min-height: 20px;"></div>
   </div>
 
@@ -25,17 +24,20 @@
       <option value="Elite">Elite</option>
     </select>
     <button class="btn-admin" onclick="generateCode()">Generuj Kod</button>
-    <div id="codeDisplay" class="code-output"></div>
+    <div id="codeDisplay" class="code-output">...</div>
     
     <div id="stats" style="margin:15px 0; color:#888;">Aktywne kody: <span id="codeCounter">0</span></div>
-    <div id="historyList" style="font-size:0.8em; color:#555; margin-bottom:15px;"></div>
+    <div id="historyList" style="font-size:0.8em; color:#555; margin-bottom:10px;"></div>
     
+    <button class="btn-delete" onclick="clearHistory()">Wyczyść historię kodów</button>
+    
+    <hr style="border:0; border-top:1px solid #333; margin: 15px 0;">
     <input type="password" id="newPassInput" placeholder="Nowe hasło">
-    <button onclick="changeAdminPassword()" style="background:#444; font-size:11px; margin-bottom: 5px;">Zmień hasło panelu</button>
+    <button onclick="changeAdminPassword()" style="background:#333; font-size:11px;">Zmień hasło</button>
     <button onclick="logout()" style="background:#c0392b; font-size:11px;">Wyloguj</button>
   </div>
 
-  <hr>
+  <hr style="border:0; height:1px; background:#333; margin:30px 0;">
 
   <div id="test-section" class="card">
     <h2>Aktywacja Nagrody</h2>
@@ -53,13 +55,11 @@
          <button style="background:#5865f2; color:white;">DOŁĄCZ DO DISCORDA</button>
        </a>
     </div>
-    <button onclick="location.reload()" style="background:none; color:#555; font-size:0.8em; margin-top: 15px;">Wróć do startu</button>
+    <button onclick="location.reload()" style="background:none; color:#555; font-size:0.8em; margin-top:15px; cursor:pointer;">Wróć</button>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-
 <script src="script.js"></script>
-
 </body>
 </html>
