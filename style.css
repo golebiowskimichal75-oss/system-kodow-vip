@@ -54,4 +54,28 @@ hr { border: 0; height: 1px; background: #333; margin: 30px 0; }
     0%, 100% { transform: translateX(0); } 
     25% { transform: translateX(-10px); } 
     75% { transform: translateX(10px); } 
+/* Efekt świecenia dla przycisku aktywacji */
+.btn-test {
+    box-shadow: 0 0 5px #28a745;
+    animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 5px #28a745; }
+    50% { box-shadow: 0 0 20px #28a745; }
+    100% { box-shadow: 0 0 5px #28a745; }
+}
+
+/* Styl dla przycisku usuwania historii */
+.btn-delete {
+    background: #444;
+    color: #ff4d4d;
+    font-size: 10px;
+    margin-top: 5px;
+    border: 1px solid #555;
+}
+
+.btn-delete:hover {
+    background: #ff4d4d;
+    color: white;
 }
