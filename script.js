@@ -1,34 +1,20 @@
 let ADMIN_PASSWORD = localStorage.getItem('adminPassword') || "admin123";
 const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1495873957574873133/-r54lqxF_YnWd_VVKbkoPW-RLZfcpKysJl6JusjBQTjQgBEsk1AZUlEVZNTJ3_hSD0Sl";
 
-// Funkcja do pokazywania ładnych komunikatów zamiast alertów
 function showMsg(elementId, text, isError = true) {
     const el = document.getElementById(elementId);
+    if(!el) return;
     el.innerText = text;
     el.style.color = isError ? "#ff4d4d" : "#28a745";
-    
-    // Animacja potrząsania jeśli jest błąd
     if(isError) {
-        const parent = el.parentElement;
-        parent.classList.add('shake');
-        setTimeout(() => parent.classList.remove('shake'), 500);
+        const parentCard = el.closest('.card');
+        parentCard.classList.add('shake');
+        setTimeout(() => parentCard.classList.remove('shake'), 500);
     }
-
-    // Znikanie napisu po 3 sekundach
     setTimeout(() => { el.innerText = ""; }, 3000);
 }
 
-function checkLogin() {
-    let passInput = document.getElementById('adminPass');
-    if (passInput.value === ADMIN_PASSWORD) {
-        document.getElementById('login-section').style.display = "none";
-        document.getElementById('admin-section').style.display = "block";
-        updateUI();
-    } else {
-        showMsg("loginError", "❌ Błędne hasło panelu!");
-    }
-}
-
+// 1. GENEROWANIE I AUTOMATYCZNE KOPIOWANIE
 function generateCode() {
     let newCode = "";
     for(let i=0; i<16; i++) newCode += Math.floor(Math.random()*10);
@@ -36,16 +22,35 @@ function generateCode() {
     let codes = JSON.parse(localStorage.getItem('activeCodesRanked')) || [];
     codes.push({ key: newCode, type: rank });
     localStorage.setItem('activeCodesRanked', JSON.stringify(codes));
+    
     document.getElementById('codeDisplay').innerText = newCode;
+    
+    // Kopiowanie do schowka
+    navigator.clipboard.writeText(newCode).then(() => {
+        showMsg("loginError", "✅ Skopiowano do schowka!", false);
+    });
+    
     updateUI();
+}
+
+// 3. CZYSZCZENIE HISTORII
+function clearHistory() {
+    if(confirm("Czy na pewno usunąć wszystkie aktywne kody?")) {
+        localStorage.removeItem('activeCodesRanked');
+        updateUI();
+        document.getElementById('codeDisplay').innerText = "WYCZYSZCZONO";
+    }
 }
 
 function updateUI() {
     let codes = JSON.parse(localStorage.getItem('activeCodesRanked')) || [];
-    document.getElementById('codeCounter').innerText = codes.length;
+    const counter = document.getElementById('codeCounter');
+    if(counter) counter.innerText = codes.length;
+    
     let history = "";
     codes.slice(-3).reverse().forEach(c => history += `<small>${c.key} [${c.type}]</small><br>`);
-    document.getElementById('historyList').innerHTML = history;
+    const historyList = document.getElementById('historyList');
+    if(historyList) historyList.innerHTML = history || "Brak aktywnych kodów";
 }
 
 function redeemCode() {
@@ -55,21 +60,28 @@ function redeemCode() {
     let idx = codes.findIndex(c => c.key === input);
 
     if (!nick) {
-        showMsg("statusMsg", "⚠️ Wpisz najpierw swój Nick!");
+        showMsg("statusMsg", "⚠️ Wpisz swój Nick!");
         return;
     }
 
     if (idx !== -1) {
         let activated = codes[idx];
+        
+        // 4. LICZNIK CZASU (Godzina aktywacji)
+        const now = new Date();
+        const timeStr = now.getHours() + ":" + String(now.getMinutes()).padStart(2, '0');
+
         fetch(DISCORD_WEBHOOK, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content: `🚀 **AKTYWACJA!**\n**Użytkownik:** ${nick}\n**Ranga:** ${activated.type}` })
+            body: JSON.stringify({ 
+                content: `🚀 **AKTYWACJA!**\n**Użytkownik:** ${nick}\n**Ranga:** ${activated.type}\n**Godzina:** ${timeStr}` 
+            })
         });
+
         codes.splice(idx, 1);
         localStorage.setItem('activeCodesRanked', JSON.stringify(codes));
         
-        // EFEKT SUKCESU (Konfetti)
         confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         
         document.getElementById('test-section').style.display = "none";
@@ -80,23 +92,20 @@ function redeemCode() {
     }
 }
 
-function logout() { 
-    document.getElementById('admin-section').style.display = "none";
-    document.getElementById('login-section').style.display = "block";
-    document.getElementById('adminPass').value = "";
-}
-
-function changeAdminPassword() {
-    let p = document.getElementById('newPassInput').value;
-    if(p.length > 3) { 
-        ADMIN_PASSWORD = p; 
-        localStorage.setItem('adminPassword', p); 
-        alert("Hasło zmienione!"); // Tu zostawiłem alert, bo to rzadka akcja
-        logout(); 
+function checkLogin() {
+    let passInput = document.getElementById('adminPass');
+    if (passInput.value === ADMIN_PASSWORD) {
+        document.getElementById('login-section').style.display = "none";
+        document.getElementById('admin-section').style.display = "block";
+        updateUI();
     } else {
-        alert("Za krótkie hasło!");
+        showMsg("loginError", "❌ Błędne hasło!");
     }
 }
 
-// Odśwież UI na starcie
+function logout() { 
+    document.getElementById('admin-section').style.display = "none";
+    document.getElementById('login-section').style.display = "block";
+}
+
 updateUI();
